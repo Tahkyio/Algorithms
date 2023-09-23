@@ -22,22 +22,28 @@ void clearDynMatrix(int **matrix, int n)
 
 void fillDynMatrix(int **matrix, int n)
 {
-
 	for (int i = 0; i < n; i++)
-	{
 		for (int j = 0; j < n; j++)
-		{
-			matrix[i][j] = 1+ rand()%100;
-		}
-	}
+			 matrix[i][j] = 1+ rand()%100;
 }
 
-void printDynMatrix(int **matrix, int n)
+void fill_costDynMatrix(int** matrix, int n)
 {
 	for (int i = 0; i < n; i++)
-{
 		for (int j = 0; j < n; j++)
-			printf_s("%d ", matrix[i][j]);
-		std::cout << "\n";
-	}
+		{
+			if (i == j) matrix[i][j] = 0;
+			else matrix[i][j] = 1 + rand() % 100;
+		}	
+}
+void printDynMatrix(int **matrix, int n)
+{
+	if (n <= 30)
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+				printf_s("%3d ", matrix[i][j]);
+			std::cout << "\n";
+		}
+	else std::cout << "Matrix is too big to show properly, sorry!\n";
 }
