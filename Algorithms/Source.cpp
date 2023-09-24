@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <conio.h>
 #include <iostream>
+#include <chrono>
 #include "Functions.h"
-//#include <chrono.h>
+
+
 
 void printArray(int* array, int len)  //Для проверки нужно было
 {
@@ -12,11 +14,16 @@ void printArray(int* array, int len)  //Для проверки нужно было
 
 int main()
 {
-	int n = 0, cityCount = 0, start = 10000000, currentCity=0, cost = 0, minCost = 10000000, i_city=0;
-	int* cityCheck = nullptr;
+	int n = 0, cityCount = 0, start = 10000000, currentCity=0, cost = 0, minCost = 10000000, i_city=0,i=0;
+	bool* cityCheck = nullptr;
 	int** matrix = nullptr;
 	/////////////////////////////////////////////////////////////////
-	std::cout << "How many cities are there?\nn="; std::cin >> n;
+	std::cout << "How many cities are there?\n";
+	do { 
+		std::cout << "n=";  std::cin >> n;
+		if (n < 0) std::cout << "The amount of cities can't be negative\n";
+		else if (n >= 0 && n <= 1) std::cout << "Add more cities! There's nothing to calculate\n";
+	} while (n <= 1);
 	std::cout << "What is the starting point? From 1 to n\n";
 
 	do {											  //Проверка на дурака
@@ -24,36 +31,38 @@ int main()
 		if (start > n) std::cout << "There are only " << n << " cities!\n";
 		else if(start<=0) std::cout << "You can't choose this starting point\n";
 	} while (start > n || start<=0);
+	std::cout << "\n";
+	currentCity = --start;
 
-	if (start == 0) start++;						 //Я считаю города от 1 до n, а не от 0 как программист
-	currentCity = --start; 
+	///////////////////////////////////////////////////////////////////
 
-	////////////
-
-	cityCheck = new int[n];
-	for (int i = 0; i < n; i++)
-		cityCheck[i] = 0;
-	cityCheck[start] = 1;							 //НЕ ЗАБУДЬ ОЧИСТИТЬ!!
+	cityCheck = new bool[n];
+	for (int i = 0; i < n; i++)						      //Массив, который можно читать как "Могу ли я поехать в этот город?"
+		cityCheck[i] = true;
+	cityCheck[start] = false;							 //НЕ ЗАБУДЬ ОЧИСТИТЬ!!   Утечка?? Я не понимаю что он хочет
 	//printArray(cityCheck, n);
+
 	matrix = generateDynMatrix(matrix, n);
-	fill_costDynMatrix(matrix, n);
-	printDynMatrix(matrix, n);
+	fillDynMatrix(matrix, n); for (i = 0; i < n; i++) matrix[i][i] = 0;
+	printDynMatrix(matrix, n); std::cout << "\n";
+
+	auto begin = std::chrono::steady_clock::now();
 
 	while (cityCount<n-1)			///////Метод перебора
 	{
-		std::cout << currentCity+1 << "->";
+		if(n<30) std::cout << currentCity+1 << "->";
 		minCost = 1000000000;
-		for (int j = 0; j < n; j++) 
+		for (i = 0; i < n; i++) 
 		{
-			if (minCost > matrix[currentCity][j] && cityCheck[j]==0 && matrix[currentCity][j] !=0) //ищем дорогу минимальной стоимости из НЫНЕШНЕГО города 
+			if (minCost > matrix[currentCity][i] && cityCheck[i] && matrix[currentCity][i] !=0) //ищем дорогу минимальной стоимости из НЫНЕШНЕГО города 
 													//Второе условие нужно, чтобы мы не зациклилсь и прошли по всем городам
 			{
-				minCost = matrix[currentCity][j];
-				i_city = j;								//запоминаем город, куда значение пути минимально
+				minCost = matrix[currentCity][i];
+				i_city = i;								//запоминаем город, куда значение пути минимально
 			}
 		}
 		cost += minCost;								//Подходящую минимальную стоимость прибавляем к общей
-		cityCheck[i_city]++;							//Говорим, что в этом городе мы уже были
+		cityCheck[i_city]=false;							//Говорим, что в этом городе мы уже были
 		cityCount++;									//Продвинулись по городам  PS. Нам нужно возвращаться в изначальный город? 
 		currentCity = i_city;							//Можно попробовать сделать функцию суммы массива, но не уверена что выгоднее
 
@@ -61,8 +70,13 @@ int main()
 		//std::cout << currentCity <<" " << cityCount << "\n";    
 		//printArray(cityCheck,n);
 	}
-	std::cout <<currentCity+1<< "\nMinimal total cost: " << cost <<"\n";
+	if (n < 30)std::cout << currentCity + 1<<"\n";
+	auto end = std::chrono::steady_clock::now();
 
+	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+	
+	std::cout<< "\nMinimal total cost: " << cost <<"\n";
+	std::cout << "Calculation time: " << elapsed_ms.count() << " ms\n";
 	/////////////////////////////////////////////////////////////////
 	delete[] cityCheck; 
 	clearDynMatrix(matrix,n);
