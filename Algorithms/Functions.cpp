@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <iostream>
 
+int calculatePermutation(int n)
+{
+	int a=1;
+	for (int i = 1; i <= n; i++)
+		a *= i;
+	return a;
+}
+
 int** generateDynMatrix(int** matrix, int n)
 {
 	matrix = new int* [n];
@@ -37,4 +45,10 @@ void printDynMatrix(int **matrix, int n)
 			std::cout << "\n";
 		}
 	else std::cout << "Matrix is too big to be shown properly, sorry!\n";
+}
+
+void printArray(int* array, int len)  //Для проверки нужно было
+{
+	for (int i = 0; i < len; i++) std::cout << array[i] << " ";
+	std::cout << "\n";
 }

@@ -6,16 +6,11 @@
 
 
 
-void printArray(int* array, int len)  //Для проверки нужно было
-{
-	for (int i = 0; i < len; i++) std::cout << array[i] << " ";
-	std::cout << "\n";
-}
 
 int main()
 {
-	int n = 0, cityCount = 0, start = 10000000, currentCity=0, cost = 0, minCost = 10000000, i_city=0,i=0;
-	bool* cityCheck = nullptr;
+	int n = 0, start = 10000000, cost=0;
+	int* array_P = nullptr;
 	int** matrix = nullptr;
 	/////////////////////////////////////////////////////////////////
 	std::cout << "How many cities are there?\n";
@@ -32,53 +27,56 @@ int main()
 		else if(start<=0) std::cout << "You can't choose this starting point\n";
 	} while (start > n || start<=0);
 	std::cout << "\n";
-	currentCity = --start;
+	start--;
 
 	///////////////////////////////////////////////////////////////////
-
-	cityCheck = new bool[n];
-	for (int i = 0; i < n; i++)						      //Массив, который можно читать как "Могу ли я поехать в этот город?"
-		cityCheck[i] = true;
-	cityCheck[start] = false;							 //НЕ ЗАБУДЬ ОЧИСТИТЬ!!   Утечка?? Я не понимаю что он хочет
-	//printArray(cityCheck, n);
+	int i = 0;
+	array_P = new int[n];					 //НЕ ЗАБУДЬ ОЧИСТИТЬ!!  
+	for (i = 0; i < n; i++)
+		array_P[i] = i + 1;
 
 	matrix = generateDynMatrix(matrix, n);
+
 	fillDynMatrix(matrix, n); for (i = 0; i < n; i++) matrix[i][i] = 0;
 	printDynMatrix(matrix, n); std::cout << "\n";
 
-	auto begin = std::chrono::steady_clock::now();
-
-	while (cityCount<n-1)			///////Метод перебора
+	//auto begin = std::chrono::steady_clock::now();
+	int j = 0, k = 0, needed_i = 0, needed_j = 0;
+	for (i = 0; i < calculatePermutation(n)-1; i++)
 	{
-		if(n<30) std::cout << currentCity+1 << "->";
-		minCost = 1000000000;
-		for (i = 0; i < n; i++) 
+		printArray(array_P, n);
+		int tmp = 0;
+		for (j = 1; j < n - 1 && array_P[j - 1] < array_P[j]; j++)
+			needed_i = j;
+
+		for (j = needed_i+1; j <n-1; j++)
+			if(array_P[needed_i] < array_P[j]) needed_j = j;
+
+
+		tmp = array_P[needed_i];
+		array_P[needed_i] = array_P[needed_j];
+		array_P[needed_j] = tmp;
+
+		if (needed_i!=n-2)
+		for (j = needed_i + 1, k = n - 1; j < k; j++,k--)
 		{
-			if (minCost > matrix[currentCity][i] && cityCheck[i] && matrix[currentCity][i] !=0) //ищем дорогу минимальной стоимости из НЫНЕШНЕГО города 
-													//Второе условие нужно, чтобы мы не зациклилсь и прошли по всем городам
-			{
-				minCost = matrix[currentCity][i];
-				i_city = i;								//запоминаем город, куда значение пути минимально
-			}
+			tmp = array_P[j];
+			array_P[j] = array_P[k];
+			array_P[k] = tmp;
 		}
-		cost += minCost;								//Подходящую минимальную стоимость прибавляем к общей
-		cityCheck[i_city]=false;							//Говорим, что в этом городе мы уже были
-		cityCount++;									//Продвинулись по городам  PS. Нам нужно возвращаться в изначальный город? 
-		currentCity = i_city;							//Можно попробовать сделать функцию суммы массива, но не уверена что выгоднее
-
-		
-		//std::cout << currentCity <<" " << cityCount << "\n";    
-		//printArray(cityCheck,n);
 	}
-	if (n < 30)std::cout << currentCity + 1<<"\n";
-	auto end = std::chrono::steady_clock::now();
 
-	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+
+
+
+	//auto end = std::chrono::steady_clock::now();
+
+	//auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 	
 	std::cout<< "\nMinimal total cost: " << cost <<"\n";
-	std::cout << "Calculation time: " << elapsed_ms.count() << " ms\n";
+	//std::cout << "Calculation time: " << elapsed_ms.count() << " ms\n";
 	/////////////////////////////////////////////////////////////////
-	delete[] cityCheck; 
+	delete[] array_P; 
 	clearDynMatrix(matrix,n);
 	return 0;
 }
