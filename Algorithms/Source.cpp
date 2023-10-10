@@ -9,7 +9,7 @@
 
 int main()
 {
-	int n = 0, start = 10000000, cost=0;
+	int n = 0, start = 10000000, cost=1000000000;
 	int* array_P = nullptr;
 	int** matrix = nullptr;
 	/////////////////////////////////////////////////////////////////
@@ -27,7 +27,6 @@ int main()
 		else if(start<=0) std::cout << "You can't choose this starting point\n";
 	} while (start > n || start<=0);
 	std::cout << "\n";
-	start--;
 
 	///////////////////////////////////////////////////////////////////
 	int i = 0;
@@ -40,41 +39,54 @@ int main()
 	fillDynMatrix(matrix, n); for (i = 0; i < n; i++) matrix[i][i] = 0;
 	printDynMatrix(matrix, n); std::cout << "\n";
 
-	//auto begin = std::chrono::steady_clock::now();
+	auto begin = std::chrono::steady_clock::now();
 	int j = 0, k = 0, needed_i = 0, needed_j = 0;
-	for (i = 0; i < calculatePermutation(n)-1; i++)
+	bool check = true;
+	while (check)
 	{
-		printArray(array_P, n);
 		int tmp = 0;
-		for (j = 1; j < n - 1 && array_P[j - 1] < array_P[j]; j++)
-			needed_i = j;
-
-		for (j = needed_i+1; j <n-1; j++)
-			if(array_P[needed_i] < array_P[j]) needed_j = j;
-
-
-		tmp = array_P[needed_i];
-		array_P[needed_i] = array_P[needed_j];
-		array_P[needed_j] = tmp;
-
-		if (needed_i!=n-2)
-		for (j = needed_i + 1, k = n - 1; j < k; j++,k--)
+		needed_i = -1;
+		if (array_P[0] == start)
 		{
-			tmp = array_P[j];
-			array_P[j] = array_P[k];
-			array_P[k] = tmp;
+			//printArray(array_P, n);
+			for (i = 1; i < n; i++) tmp += matrix[array_P[i-1]-1][array_P[i]-1];
+			cost = min(cost, tmp);
+
+		}
+		for (i = 0; i < n - 1; i++)
+		{
+			if(array_P[i] < array_P[i + 1]) needed_i = i;
+		}
+		if (needed_i == -1 || start<array_P[0]) break;
+		else
+		{
+			for (j = needed_i+1; j <n; j++)
+				if(array_P[needed_i] < array_P[j]) needed_j = j;
+
+
+			tmp = array_P[needed_i];
+			array_P[needed_i] = array_P[needed_j];
+			array_P[needed_j] = tmp;
+
+			if (needed_i!=n-2)
+			for (j = needed_i + 1, k = n - 1; j < k; j++,k--)
+			{
+				tmp = array_P[j];
+				array_P[j] = array_P[k];
+				array_P[k] = tmp;
+			}
 		}
 	}
 
 
 
 
-	//auto end = std::chrono::steady_clock::now();
+	auto end = std::chrono::steady_clock::now();
 
-	//auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 	
 	std::cout<< "\nMinimal total cost: " << cost <<"\n";
-	//std::cout << "Calculation time: " << elapsed_ms.count() << " ms\n";
+	std::cout << "Calculation time: " << elapsed_ms.count() << " ms\n";
 	/////////////////////////////////////////////////////////////////
 	delete[] array_P; 
 	clearDynMatrix(matrix,n);

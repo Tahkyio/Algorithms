@@ -1,4 +1,6 @@
 #pragma once
+int max(int, int);
+int min(int, int);
 int calculatePermutation(int);
 int** generateDynMatrix(int**, int);
 void clearDynMatrix(int**, int);
