@@ -19,6 +19,13 @@ int calculatePermutation(int n)
 		a *= i;
 	return a;
 }
+int calculatePathCost(int** const costMatrix, int* permutationsArray, const int n)
+{
+	int cost=0;
+	for (int i = 1; i < n; i++)
+		cost += costMatrix[permutationsArray[i-1]-1][permutationsArray[i]-1];
+	return cost;
+}
 
 int** generateDynMatrix(int** matrix, int n)
 {
@@ -56,6 +63,22 @@ void printDynMatrix(int **matrix, int n)
 			std::cout << "\n";
 		}
 	else std::cout << "Matrix is too big to be shown properly, sorry!\n";
+}
+
+void copyArray(int* from, int* to, int n_from, int n_to)
+{
+	int i = 0;
+	if (n_from < n_to)
+	{
+		for (i = 0; i < n_from; i++)
+			to[i] = from[i];
+		for (i = n_from; i < n_to; i++)
+			to[i] = 0;
+	}
+	else
+		for (i = 0; i < n_to; i++)
+			to[i] = from[i];
+
 }
 
 void printArray(int* array, int len)  //Для проверки нужно было
