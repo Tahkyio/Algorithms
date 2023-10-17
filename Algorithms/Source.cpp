@@ -92,7 +92,6 @@ int main()
 		matrix[i][i] = 0;
 	printDynMatrix(matrix, n); std::cout << "\n";
 
-	auto begin = std::chrono::steady_clock::now();
 	int i =0,j= 0;
 	array_P = new int[n];					 //НЕ ЗАБУДЬ ОЧИСТИТЬ!! 
 	array_P[0] = start;
@@ -104,17 +103,18 @@ int main()
 			array_P[i] = j;
 	}
 
+	auto begin = std::chrono::steady_clock::now();
 	findMinPath(matrix, n, start, array_P);
 	std::cout << "MinCost Path: ";
 	printArray(array_P, n);
 	cost = calculatePathCost(matrix, array_P, n);
-
 	auto end = std::chrono::steady_clock::now();
+
 	delete[] array_P;
 
 	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 
-	std::cout<< "Minimal total cost: " << cost <<"\n";
+	std::cout<< "MinCcost: " << cost <<"\n";
 	std::cout << "Calculation time: " << elapsed_ms.count() << " ms\n";
 
 	
