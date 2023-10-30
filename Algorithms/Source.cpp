@@ -62,6 +62,37 @@ void findMinPath(int** matrix, const int n, const int start, int* minPath) //о�
 	delete[] array_P;
 }
 
+void findMinPath_Greedy(int** matrix, const int n, const int start, int* minPath)
+//Идея: пробегаемся по столбикам по городам: ищем там минимальную дорогу - записываем в минПас
+//меняем currentCity на город, в который мы уехали - повторяем процесс
+{
+	bool* cityCheck;
+	cityCheck = new bool[n]; //были ли в городе?
+	for (int i = 0; i < n; i++)
+		cityCheck[i] = false;
+	cityCheck[start-1] = true;
+
+	int cityCount=0, currentCity=start-1;
+
+	while (cityCount < n - 1)		
+	{
+		minPath[cityCount] = currentCity+1;
+		int minRoad = 100'000, tmp_i=0;
+		for(int i=0; i<n;i++)
+			if (matrix[currentCity][i] < minRoad && cityCheck[i]==false)
+			{
+				tmp_i = i;
+				minRoad = min(minRoad, matrix[currentCity][i]);
+			}
+
+		currentCity = tmp_i;
+		cityCheck[tmp_i] = true;
+		cityCount++;
+
+	}
+	delete[] cityCheck;
+}
+
 int main()
 {
 	int n = 0, start = 1, cost=INT_MAX;
@@ -105,20 +136,29 @@ int main()
 
 	auto begin = std::chrono::steady_clock::now();
 	findMinPath(matrix, n, start, array_P);
+	auto end = std::chrono::steady_clock::now();
 	std::cout << "MinCost Path: ";
 	printArray(array_P, n);
 	cost = calculatePathCost(matrix, array_P, n);
-	auto end = std::chrono::steady_clock::now();
-
-	delete[] array_P;
-
 	auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
 
 	std::cout<< "MinCcost: " << cost <<"\n";
 	std::cout << "Calculation time: " << elapsed_ms.count() << " ms\n";
+	/////////
 
-	
+	auto begin1 = std::chrono::steady_clock::now();
+	findMinPath_Greedy(matrix, n, start, array_P);
+	auto end1 = std::chrono::steady_clock::now();
+
+	std::cout << "Possible MinCost Path: ";
+	printArray(array_P, n);
+	cost = calculatePathCost(matrix, array_P, n);
+	auto elapsed_ms1 = std::chrono::duration_cast<std::chrono::milliseconds>(end1 - begin1);
+
+	std::cout << "Possible MinCcost: " << cost << "\n";
+	std::cout << "Calculation time: " << elapsed_ms1.count() << " ms\n";
 	/////////////////////////////////////////////////////////////////
+	delete[] array_P;
 	clearDynMatrix(matrix,n);
 	return 0;
 }

@@ -24,7 +24,7 @@ int calculatePathCost(int** const costMatrix, int* permutationsArray, const int 
 	int cost=0;
 	for (int i = 1; i < n; i++)
 		cost += costMatrix[permutationsArray[i-1]-1][permutationsArray[i]-1];
-	cost += costMatrix[permutationsArray[0] - 1][permutationsArray[n - 1] - 1];
+	cost += costMatrix[permutationsArray[n-1] - 1][permutationsArray[0] - 1];
 	return cost;
 }
 
