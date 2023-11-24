@@ -36,10 +36,13 @@ void formTable(string word, int* tab)
 //        text
 //хоба совпало
 
-int BM_Search(string text, string word, int* table)
+
+vector<int> BmSearch(string text, string word, int* table, int maxOccurencesCount = -1, unsigned int indexFrom= 0, unsigned int indexUntill=0)
 {
+	vector<int> occurences;
 	formTable(word, table);
-	for (int unsigned i = word.length() - 1; i < text.length(); i++)
+	if (!indexUntill) indexUntill = text.length();
+	for (int unsigned i = word.length() - 1 + indexFrom; i < indexUntill; i++)
 	{
 		bool wordFound = true;
 		int i_copy = i;
@@ -50,31 +53,15 @@ int BM_Search(string text, string word, int* table)
 				wordFound = false;
 				break;
 			}
-		if (wordFound)
-			return i_copy;
+		if (wordFound) {
+			occurences.push_back(i_copy);
+			if (maxOccurencesCount > -1 && maxOccurencesCount >= occurences.size()) { //при достижении максимального чила встреч числа 
+				return occurences;
+			}
+		}
 	}
 
-	return -1;
-}
-void findAll_BMSearch(string text, string word, int* table, vector<int>& index)
-{
-	if (index.size() != 0)
-		index.clear();
-	formTable(word, table);
-	for (int unsigned i = word.length() - 1; i < text.length(); i++)
-	{
-		bool wordFound = true;
-		int i_copy = i;
-		for (int word_i = word.length() - 1; word_i > 0; word_i--, i_copy--)
-			if (word[word_i] != text[i_copy])
-			{
-				i += table[word[word_i]];
-				wordFound = false;
-				break;
-			}
-		if (wordFound)
-			index.push_back(i_copy);
-	}
+	return occurences;
 }
 
 int main()
@@ -92,11 +79,11 @@ int main()
 	//formTable(word1, table);
 	//printTable(table);
 	std::cout << text<<'\n';
-	std::cout <<word1 << " - index = "<< BM_Search(text, word1, table)<<'\n';
-	std::cout << word2 << " - index = " << BM_Search(text, word2, table) << '\n';
-	std::cout << word3 << " - index = " << BM_Search(text, word3, table) << '\n';
+	//std::cout <<word1 << " - index = "<< BmSearch(text, word1, table)<<'\n';
+	//std::cout << word2 << " - index = " << BmSearch(text, word2, table) << '\n';
+	//std::cout << word3 << " - index = " << BmSearch(text, word3, table) << '\n';
 	std::cout << testText << '\n'<< testWord<<" - ";
-	findAll_BMSearch(testText, testWord, table, resultIndex);
+	resultIndex = BmSearch(testText, testWord, table);
 	printIntVector(resultIndex);
 
 	delete[] table;
